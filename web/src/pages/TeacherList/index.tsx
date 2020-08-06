@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 
 import PageHeader from '../../components/PageHeader';
 import TeacherItem from '../../components/TeacherItem';
+import Input from '../../components/Input';
+import Select from '../../components/Select';
 import './styles.css';
 
 
@@ -38,20 +40,35 @@ const TeacherList = () => {
     <div id="page-teacher-list" className="container">
      <PageHeader title="Estes são os proffys disponíveis.">
        <form id="search-teachers">
-         <div className="input-block">
-           <label htmlFor="subject">Matéria</label>
-           <input type="text" id="subject" />
-         </div>
 
-         <div className="input-block">
-           <label htmlFor="week_day">Dia da Semana</label>
-           <input type="text" id="week_day"/>
-         </div>
+        <Select 
+          name="subject" 
+          label="Matéria" 
+          options={ [
+            { label: 'Artes', value: 'artes' },
+            { label: 'Matemática', value: 'matematica' },
+            { label: 'Ciência', value: 'ciencia' },
+            { label: 'Física', value: 'fisica' },
+            { label: 'Química', value: 'quimica' },
+          ]} 
+        />
 
-         <div className="input-block">
-           <label htmlFor="time">Hora</label>
-           <input type="text" id="time"/>
-         </div>
+        <Select 
+          name="week_day" 
+          label="Dia da Semana" 
+          options={ [
+            { label: 'Domingo', value: '0' },
+            { label: 'Segunda', value: '1' },
+            { label: 'Terça', value: '2' },
+            { label: 'Quarta', value: '3' },
+            { label: 'Quinta', value: '4' },
+            { label: 'Sexta', value: '5' },
+            { label: 'Sábado', value: '6' },
+          ]} 
+        />
+
+        <Input type="time" name="time" label="Hora" />
+
        </form>
      </PageHeader>
 
