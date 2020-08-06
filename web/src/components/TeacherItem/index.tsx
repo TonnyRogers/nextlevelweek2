@@ -1,40 +1,52 @@
 import React from 'react';
 
+import api from '../../services/api';
+
 import './styles.css';
 import whatsappIcon from '../../assets/images/icons/whatsapp.svg';
 
-interface TeacherItemProps {
-  avatar_url: string,
+
+export interface Teacher {
+  avatar: string,
   name: string,
   subject: string,
   bio: string,
-  price: number,
+  cost: number,
+  whatsapp: string,
+  id: number,
+}
+interface TeacherItemProps {
+  teacher: Teacher
 }
 
-const TeacherItem: React.FC<TeacherItemProps> = (props) => {
+const TeacherItem: React.FC<TeacherItemProps> = ({teacher}) => {
+  async function createNewConnection(teacherId: number) {
+    await api.post('/connections', { user_id: teacherId });
+  }
+
   return (
     <article className="teacher-item">
          <header>
-           <img src={props.avatar_url || `https://api.adorable.io/avatars/285/${props.name}.png`} alt={props.name}/>
+           <img src={teacher.avatar || `https://api.adorable.io/avatars/285/${teacher.name}.png`} alt={teacher.name}/>
            <div>
-             <strong>{props.name}</strong>
-             <span>{props.subject}</span>
+             <strong>{teacher.name}</strong>
+             <span>{teacher.subject}</span>
            </div>
          </header>
 
          <p>
-          {props.bio}
+          {teacher.bio}
          </p>
 
          <footer>
            <p>
              Preço/Hora
-             <strong>R${props.price}</strong>
+             <strong>R${teacher.cost}</strong>
            </p>
-           <button type="button">
+           <a onClick={() => createNewConnection(teacher.id)} href={`https://wa.me/${teacher.whatsapp.replace('+','')}?text=Gostaria%20de%20saber%20a%20disponibilidade%20das%20aulas`} target="_blank" >
              <img src={whatsappIcon} alt="Whatsapp"/>
              Entrar em contato
-           </button>
+           </a>
          </footer>
 
        </article>
