@@ -18,8 +18,14 @@ class ClassController {
     const subject = filters.subject as string;
     const time = filters.time as string;
 
+    
     if(!filters.week_day || !filters.subject || !filters.time) {
-      return response.status(400).json({ error: 'Missing search filters.' })
+      
+      const classes = await db('classes')
+      .join('users','classes.user_id', '=', 'users.id')
+      .select(['classes.*','users.*']);
+
+      return response.status(200).json(classes)
     }
 
     const timeInMinutes = convertHoursToMinutes(time);
