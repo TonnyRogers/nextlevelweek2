@@ -1,5 +1,6 @@
-import React from 'react';
-import { Image } from 'react-native';
+import React, { useState } from 'react';
+import { Image, Linking } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import { 
   Container,
@@ -17,36 +18,86 @@ import {
   ContactButton,
   ContactButtonText
 } from './styles';
-import hearOutlineIcon from '../../assets/images/icons/heart-outline.png'
-import unfavoriteIcon from '../../assets/images/icons/unfavorite.png'
-import whatsappIcon from '../../assets/images/icons/whatsapp.png'
+import hearOutlineIcon from '../../assets/images/icons/heart-outline.png';
+import unfavoriteIcon from '../../assets/images/icons/unfavorite.png';
+import whatsappIcon from '../../assets/images/icons/whatsapp.png';
+import api from '../../services/api';
 
-const TeacherItem: React.FC = () => {
+export interface Teacher {
+    id: number,
+    name: string,
+    avatar: string,
+    subject: string,
+    bio: string,
+    cost: number,
+    whatsapp: string
+}
+
+interface TeacherItemProps {
+  teacher: Teacher,
+  favorited: boolean,
+  callback: any,
+}
+
+const TeacherItem: React.FC<TeacherItemProps> = ({ teacher, favorited, callback }) => {
+  const [ isFavorited, setIsFavorited ] = useState<boolean>(favorited);
+
+  async function handleLinkToWhatsapp(teacherId: number) {
+    await api.post('/connections', { user_id: teacherId });
+    Linking.openURL(`whatsapp://send?phone=${teacher.whatsapp}`);
+  }
+
+  async function handleToggleFavorite() {
+    const favorites = await AsyncStorage.getItem('favorites');
+
+    let favoritesArray = [];
+
+    if( favorites ) {
+      favoritesArray = JSON.parse(favorites);
+    }
+
+    if(isFavorited ) {
+      const filteredIndex = favoritesArray.findIndex((teacherItem: Teacher) => {
+        if(teacherItem.id === teacher.id) {
+          return true;
+        }
+      });
+
+      favoritesArray.splice(filteredIndex,1);
+
+      setIsFavorited(false);
+    } else {
+      favoritesArray.push(teacher);
+      setIsFavorited(true);
+    }
+    
+    await AsyncStorage.setItem('favorites', JSON.stringify(favoritesArray));
+  }
+
   return (
     <Container>
       <Profile>
-        <Avatar source={{ uri: 'https://avatars2.githubusercontent.com/u/37991230?s=460&u=93bdd1c3673cc0a4685c138dbf74e0c6ec8a50e0&v=4' }} />
+        <Avatar source={{ uri: teacher.avatar || `https://api.adorable.io/avatars/285/${teacher.name}.png` }} />
         <ProfileInfo>
-          <Name>Tony Amaral</Name>
-          <Subject>Química</Subject>
+          <Name>{teacher.name}</Name>
+          <Subject>{teacher.subject}</Subject>
         </ProfileInfo>
       </Profile>
-      <Bio>
-        Além de testes automatizados, CI & CD, metodologia TDD e sempre busco estar por dentro das novidades, mas também já trabalhei com outras tecnologias como PHP, C#, .Net, alguns contatos com o Flutter e Dart.
-        Nas horas vagas gosto de fazer trilhas, acampar, viagens em geral e sempre fotografar por onde passo.
-      </Bio>
+      <Bio>{teacher.bio}</Bio>
       <Footer>
         <Price>
           Preço/Hora {'   '}
-          <PriceHour>R$20,00</PriceHour>
+          <PriceHour>R${teacher.cost}</PriceHour>
         </Price>
         <ButtonsContainer>
-          <FavoriteButton style={{ backgroundColor: '#e33d3d' }} >
-            {/* <Image source={hearOutlineIcon} /> */}
-            <Image source={unfavoriteIcon} />
+          <FavoriteButton onPress={handleToggleFavorite} favorited={isFavorited} >
+            {isFavorited
+              ? (<Image source={unfavoriteIcon} />)
+              : (<Image source={hearOutlineIcon} />)}
+            
           </FavoriteButton>
 
-          <ContactButton >
+          <ContactButton onPress={() => handleLinkToWhatsapp(teacher.id)} >
             <Image source={whatsappIcon} />
             <ContactButtonText>Entrar em contato</ContactButtonText>
           </ContactButton>

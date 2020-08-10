@@ -1,12 +1,14 @@
 import styled from 'styled-components/native';
 import { RectButton } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native';
+
 
 export const Container = styled.View`
   flex: 1;
   background: #f0f0f7;
 `;
 
-export const TeacherLister = styled.ScrollView`
+export const TeacherLister = styled(FlatList)`
   margin-top: -40px;
 `;
 
@@ -48,7 +50,7 @@ export const FilterButton = styled(RectButton)`
   border-radius: 8px;
   align-items: center;
   justify-content: center;
-  background: #d4c2ff;
+  background: rgba(255,255,255,0.3);
 `;
 
 export const SubmitButton = styled(RectButton)`
